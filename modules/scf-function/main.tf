@@ -23,9 +23,9 @@ resource "tencentcloud_scf_function" "this" {
   mem_size    = var.memory_size
   timeout     = var.timeout
 
-  # HTTP function type — required for Function URL (HTTP trigger) compatibility
-  # Default "Event" type is incompatible with HTTP trigger creation
-  func_type = "HTTP"
+  # NOTE: func_type defaults to "Event" — Event-type functions CAN have HTTP triggers.
+  # Changing func_type on an existing function is NOT supported by the SCF API.
+  # To switch to "HTTP" type, the function must be deleted and recreated.
 
   # Inline deployment from local ZIP (bootstrap mode)
   # Conflicts with cos_bucket_name / cos_object_name / cos_bucket_region
