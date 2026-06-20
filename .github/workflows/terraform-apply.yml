@@ -85,39 +85,24 @@ jobs:
                   resp = client.ListTriggers(req)
                   resp_data = json.loads(resp.to_json_string())
                   triggers = resp_data.get('Triggers', [])
-                  print(f'--- {fn}: {len(triggers)} trigger(s) ---')
                   for t in triggers:
-                      t_type = t.get('Type', 'unknown')
-                      t_name = t.get('TriggerName', '')
-                      t_enable = t.get('Enable', '?')
-                      t_desc_raw = t.get('TriggerDesc', '')
-                      print(f'  Type={t_type}, Name={t_name}, Enable={t_enable}')
-                      print(f'  TriggerDesc: {t_desc_raw[:200]}')
-                      if t_type == 'http':
-                          try:
-                              desc = json.loads(t_desc_raw)
-                              # Try multiple possible URL locations
-                              url = desc.get('NetConfig', {}).get('Host', '')
-                              if not url:
-                                  url = desc.get('Host', '')
-                              if not url:
-                                  url = desc.get('URL', '')
-                              if url:
-                                  urls[fn] = url
-                                  print(f'  >>> Function URL: https://{url}')
-                          except json.JSONDecodeError:
-                              print(f'  Could not parse TriggerDesc as JSON')
+                      if t.get('Type') == 'http':
+                          desc = json.loads(t.get('TriggerDesc', '{}'))
+                          net = desc.get('NetConfig', {})
+                          # Prefer ExtranetUrl (public), fallback to Url
+                          url = net.get('ExtranetUrl', '') or net.get('Url', '') or net.get('IntranetUrl', '')
+                          if url:
+                              # Remove http:// prefix if present, always use https
+                              url = url.replace('http://', 'https://')
+                              if not url.startswith('https://'):
+                                  url = 'https://' + url
+                              urls[fn] = url
+                              print(f'{fn}: {url}')
               except Exception as e:
-                  print(f'--- {fn}: ERROR - {e} ---')
+                  print(f'{fn}: ERROR - {e}')
 
-          print()
-          print('=== Summary ===')
-          if urls:
-              for fn, url in sorted(urls.items()):
-                  print(f'{fn}: https://{url}')
-          else:
+          if not urls:
               print('WARNING: No HTTP trigger URLs found')
-              print('Triggers may not have been created or URL format is unexpected')
           "
         env:
           TENCENTCLOUD_SECRET_ID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
