@@ -13,7 +13,7 @@ resource "tencentcloud_api_gateway_api" "route" {
   for_each = { for r in var.routes : "${r.method}-${r.path}" => r }
 
   service_id    = tencentcloud_api_gateway_service.this.id
-  api_name      = replace(replace(each.value.path, "/", "-"), "-", "_")}_${each.value.method}
+  api_name      = "${replace(replace(each.value.path, "/", "-"), "-", "_")}_${each.value.method}"
   api_desc      = "${each.value.method} ${each.value.path}"
   protocol      = "HTTP"
   request_method = each.value.method
