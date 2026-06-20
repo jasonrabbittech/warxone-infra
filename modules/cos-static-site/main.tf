@@ -17,8 +17,6 @@ resource "tencentcloud_cos_bucket" "this" {
     max_age_seconds = 3600
   }
 
-  tags = merge(var.tags, {
-    ManagedBy = "terraform"
-    Project   = "warxone"
-  })
+  # Use app: namespace prefix for tags to avoid COS reserved prefix (cos:) conflicts
+  tags = var.tags
 }

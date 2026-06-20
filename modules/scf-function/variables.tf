@@ -72,3 +72,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "enable_http_trigger" {
+  description = "Whether to create an HTTP trigger (Function URL) for direct HTTP access"
+  type        = bool
+  default     = false
+}

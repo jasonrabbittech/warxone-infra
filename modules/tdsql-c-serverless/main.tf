@@ -20,7 +20,7 @@ resource "tencentcloud_cynosdb_cluster" "this" {
 
   force_delete = true
 
-  tags = merge(var.tags, { Module = "tdsql-c-serverless" })
+  tags = merge(var.tags, { "app:module" = "tdsql-c-serverless" })
 }
 
 # Create the application database

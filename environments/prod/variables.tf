@@ -23,13 +23,13 @@ variable "environment" {
 }
 
 variable "tags" {
-  description = "Common tags for all resources"
+  description = "Common tags for all resources (app: prefix to avoid Tencent Cloud reserved keys)"
   type        = map(string)
   default = {
-    Project     = "warxone"
-    Environment = "prod"
-    ManagedBy   = "terraform"
-    Owner       = "isaac"
+    "app:project"    = "warxone"
+    "app:env"        = "prod"
+    "app:managed-by" = "terraform"
+    "app:owner"      = "isaac"
   }
 }
 
