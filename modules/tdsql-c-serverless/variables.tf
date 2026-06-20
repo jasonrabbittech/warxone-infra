@@ -1,5 +1,5 @@
 variable "instance_name" {
-  description = "TDSQL-C instance name"
+  description = "TDSQL-C cluster name"
   type        = string
 }
 
@@ -32,15 +32,9 @@ variable "db_username" {
 }
 
 variable "db_password" {
-  description = "Application database password"
+  description = "Database password (root and app user)"
   type        = string
   sensitive   = true
-}
-
-variable "pay_type" {
-  description = "0 = postpaid (pay-as-you-go), 1 = prepaid"
-  type        = number
-  default     = 0
 }
 
 variable "tags" {

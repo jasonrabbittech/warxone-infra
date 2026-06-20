@@ -85,13 +85,14 @@ module "scf" {
   source = "../../modules/scf-function"
   for_each = local.scf_functions
 
-  function_name  = "warxone-${each.key}"
-  description    = each.value.desc
-  memory_size    = each.value.mem
-  timeout        = each.value.timeout
-  cos_bucket     = module.scf_deploy_bucket.bucket_name
-  cos_object_key = "functions/${each.key}.zip"
-  environment    = merge(local.scf_env, {
+  function_name    = "warxone-${each.key}"
+  description      = each.value.desc
+  memory_size      = each.value.mem
+  timeout          = each.value.timeout
+  cos_bucket       = module.scf_deploy_bucket.bucket_name
+  cos_object_key   = "functions/${each.key}.zip"
+  cos_bucket_region = var.region
+  environment      = merge(local.scf_env, {
     # Google-specific env vars only for auth-google
     GOOGLE_CLIENT_ID     = each.key == "auth-google" ? var.google_client_id : ""
     GOOGLE_CLIENT_SECRET = each.key == "auth-google" ? var.google_client_secret : ""

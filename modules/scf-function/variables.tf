@@ -43,6 +43,12 @@ variable "cos_object_key" {
   type        = string
 }
 
+variable "cos_bucket_region" {
+  description = "COS bucket region (e.g. ap-hongkong)"
+  type        = string
+  default     = "ap-hongkong"
+}
+
 variable "environment" {
   description = "Environment variables for the function"
   type        = map(string)

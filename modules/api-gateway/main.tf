@@ -2,7 +2,7 @@
 resource "tencentcloud_api_gateway_service" "this" {
   service_name = var.service_name
   protocol     = var.protocol
-  net_type     = join(",", var.net_type)
+  net_type     = toset(var.net_type)
   ip_version   = "IPv4"
 
   tags = merge(var.tags, { Module = "api-gateway" })
