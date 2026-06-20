@@ -2,7 +2,7 @@
 # Schema source: tencentcloudstack/terraform-provider-tencentcloud
 
 resource "tencentcloud_scf_function" "this" {
-  function_name = var.function_name
+  name          = var.function_name
   description   = var.description
   runtime       = var.runtime
   handler       = var.handler
