@@ -53,4 +53,23 @@ resource "tencentcloud_scf_trigger_config" "http" {
   type          = "http"
   enable        = "OPEN"
   qualifier     = "$DEFAULT"
+
+  # Required for HTTP triggers: auth type and network config
+  # AuthType: NONE (public) or CAM (CAM auth)
+  # EnableIntranet: VPC access (needed for DB connectivity)
+  # EnableExtranet: public internet access (needed for frontend)
+  trigger_desc = jsonencode({
+    AuthType  = "NONE"
+    NetConfig = {
+      EnableIntranet = true
+      EnableExtranet = true
+    }
+  })
+
+  # Workaround: provider bug — Read function unmarshals HTTP trigger_desc
+  # into timer-trigger struct, causing it to read back as "" and trigger
+  # perpetual plan drift. ignore_changes prevents this.
+  lifecycle {
+    ignore_changes = [trigger_desc]
+  }
 }
