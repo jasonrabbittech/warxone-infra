@@ -1,6 +1,6 @@
 output "function_name" {
   description = "SCF function name"
-  value       = tencentcloud_scf_function.this.function_name
+  value       = tencentcloud_scf_function.this.name
 }
 
 output "function_id" {
