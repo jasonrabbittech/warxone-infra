@@ -42,7 +42,16 @@ jobs:
 
       - name: Terraform Apply
         if: steps.plan.outcome == 'success'
-        run: terraform apply -auto-approve -input=false
+        run: >
+          terraform apply -auto-approve -input=false
+          -replace='module.scf["auth-login"].tencentcloud_scf_function.this'
+          -replace='module.scf["auth-register"].tencentcloud_scf_function.this'
+          -replace='module.scf["auth-google"].tencentcloud_scf_function.this'
+          -replace='module.scf["auth-refresh"].tencentcloud_scf_function.this'
+          -replace='module.scf["auth-logout"].tencentcloud_scf_function.this'
+          -replace='module.scf["game-save"].tencentcloud_scf_function.this'
+          -replace='module.scf["game-load"].tencentcloud_scf_function.this'
+          -replace='module.scf["game-delete"].tencentcloud_scf_function.this'
         env:
           TENCENTCLOUD_SECRET_ID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
           TENCENTCLOUD_SECRET_KEY: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
