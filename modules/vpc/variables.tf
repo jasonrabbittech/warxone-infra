@@ -18,7 +18,7 @@ variable "subnet_cidr_block" {
 variable "zone" {
   description = "Availability zone for subnet"
   type        = string
-  default     = "ap-hongkong-1"
+  default     = "ap-hongkong-2"
 }
 
 variable "tags" {

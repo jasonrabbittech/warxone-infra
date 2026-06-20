@@ -12,7 +12,7 @@ variable "engine_version" {
 variable "zone" {
   description = "Availability zone"
   type        = string
-  default     = "ap-hongkong-1"
+  default     = "ap-hongkong-2"
 }
 
 variable "vpc_id" {

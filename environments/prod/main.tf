@@ -5,7 +5,7 @@ module "vpc" {
   name              = "warxone-vpc"
   cidr_block        = "10.0.0.0/16"
   subnet_cidr_block = "10.0.1.0/24"
-  zone              = "ap-hongkong-1"
+  zone              = "ap-hongkong-2"
   tags              = var.tags
 }
 
@@ -35,7 +35,7 @@ module "database" {
   source = "../../modules/tdsql-c-serverless"
 
   instance_name = "warxone-db"
-  zone          = "ap-hongkong-1"
+  zone          = "ap-hongkong-2"
   vpc_id        = module.vpc.vpc_id
   subnet_id     = module.vpc.subnet_id
   db_password   = var.db_password
