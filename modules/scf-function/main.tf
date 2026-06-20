@@ -40,42 +40,30 @@ resource "tencentcloud_scf_function" "this" {
 
   tags = merge(var.tags, { "app:module" = "scf-function" })
 
-  # Allow CI/CD to update function code without Terraform reverting it.
-  # Terraform manages infrastructure; code deployments are separate.
-  lifecycle {
-    ignore_changes = [zip_file]
-  }
-}
-
-# HTTP trigger (Function URL) — replaces deprecated API Gateway product
-# API Gateway was discontinued 2024-07-01; Function URL is the recommended replacement
-resource "tencentcloud_scf_trigger_config" "http" {
-  count = var.enable_http_trigger ? 1 : 0
-
-  function_name = tencentcloud_scf_function.this.name
-  trigger_name  = "http-trigger"
-  type          = "http"
-  enable        = "OPEN"
-  # $LATEST qualifier — $DEFAULT alias doesn't exist until a version is published
-  # The UpdateTrigger API returns ResourceNotFound if qualifier doesn't exist
-  qualifier     = "$LATEST"
-
-  # Required for HTTP triggers: auth type and network config
-  # AuthType: NONE (public) or CAM (CAM auth)
-  # EnableIntranet: VPC access (needed for DB connectivity)
-  # EnableExtranet: public internet access (needed for frontend)
-  trigger_desc = jsonencode({
-    AuthType  = "NONE"
-    NetConfig = {
-      EnableIntranet = true
-      EnableExtranet = true
+  # Inline HTTP trigger (Function URL)
+  # Uses CreateTrigger API (NOT UpdateTrigger), which works correctly for HTTP triggers.
+  # The separate tencentcloud_scf_trigger_config resource uses UpdateTrigger API
+  # which returns ResourceNotFound for HTTP triggers.
+  dynamic "triggers" {
+    for_each = var.enable_http_trigger ? [1] : []
+    content {
+      name         = "http-trigger"
+      type         = "http"
+      trigger_desc = jsonencode({
+        AuthType  = "NONE"
+        NetConfig = {
+          EnableIntranet = true
+          EnableExtranet = true
+        }
+      })
     }
-  })
+  }
 
-  # Workaround: provider bug — Read function unmarshals HTTP trigger_desc
-  # into timer-trigger struct, causing it to read back as "" and trigger
-  # perpetual plan drift. ignore_changes prevents this.
+  # Allow CI/CD to update function code without Terraform reverting it.
+  # Also ignore triggers to avoid perpetual drift from trigger_desc read bug:
+  # the provider parses HTTP trigger_desc as a timer-trigger struct, reading
+  # it back as empty, causing diff on every plan.
   lifecycle {
-    ignore_changes = [trigger_desc]
+    ignore_changes = [zip_file, triggers]
   }
 }

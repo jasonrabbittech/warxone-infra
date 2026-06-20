@@ -10,5 +10,6 @@ output "function_id" {
 
 output "http_trigger_url" {
   description = "HTTP trigger (Function URL) endpoint, if enabled"
-  value       = length(tencentcloud_scf_trigger_config.http) > 0 ? tencentcloud_scf_function.this.trigger_info : null
+  # The 'host' attribute is populated by SCF when an HTTP trigger exists
+  value = var.enable_http_trigger && tencentcloud_scf_function.this.host != "" ? "https://${tencentcloud_scf_function.this.host}" : null
 }
