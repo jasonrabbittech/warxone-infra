@@ -4,13 +4,13 @@ output "cluster_id" {
 }
 
 output "host" {
-  description = "TDSQL-C internal connection address"
-  value       = tencentcloud_cynosdb_cluster.this.vip
+  description = "TDSQL-C internal connection address (VIP from RW group)"
+  value       = tencentcloud_cynosdb_cluster.this.rw_group_addr[0].ip
 }
 
 output "port" {
   description = "TDSQL-C connection port"
-  value       = tencentcloud_cynosdb_cluster.this.vport
+  value       = tencentcloud_cynosdb_cluster.this.port
 }
 
 output "db_username" {

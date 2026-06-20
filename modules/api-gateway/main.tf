@@ -9,24 +9,34 @@ resource "tencentcloud_api_gateway_service" "this" {
 }
 
 # Create an API for each route, binding to SCF
+# Schema source: tencentcloudstack/terraform-provider-tencentcloud
+# - request_config_path (required): frontend path
+# - request_config_method: frontend HTTP method
+# - service_config_type: backend type (SCF)
+# - service_config_scf_*: flat SCF integration attributes (NOT a nested block)
 resource "tencentcloud_api_gateway_api" "route" {
   for_each = { for r in var.routes : "${r.method}-${r.path}" => r }
 
-  service_id    = tencentcloud_api_gateway_service.this.id
-  api_name      = "${replace(replace(each.value.path, "/", "-"), "-", "_")}_${each.value.method}"
-  api_desc      = "${each.value.method} ${each.value.path}"
-  protocol      = "HTTP"
-  request_method = each.value.method
-  request_path   = each.value.path
-  auth_type      = "NONE"
+  service_id = tencentcloud_api_gateway_service.this.id
+  api_name   = "${replace(replace(each.value.path, "/", "-"), "-", "_")}_${each.value.method}"
+  api_desc   = "${each.value.method} ${each.value.path}"
+  protocol   = "HTTP"
 
-  # SCF backend integration
-  service_type        = "SCF"
-  service_scfs {
-    function_name = each.value.function_name
-    namespace     = "default"
-    is_integrated_response = true
-  }
+  # Frontend request configuration
+  request_config_path   = each.value.path
+  request_config_method = each.value.method
+
+  auth_type   = "NONE"
+  enable_cors = true
+
+  # SCF backend integration (flat attributes, NOT a block)
+  service_config_type                           = "SCF"
+  service_config_scf_function_name              = each.value.function_name
+  service_config_scf_function_namespace         = "default"
+  service_config_scf_function_qualifier         = "$LATEST"
+  service_config_scf_function_type              = "EVENT"
+  service_config_scf_is_integrated_response     = true
+  service_config_timeout                        = 15
 }
 
 # Release the service
