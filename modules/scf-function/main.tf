@@ -60,10 +60,10 @@ resource "tencentcloud_scf_function" "this" {
   }
 
   # Allow CI/CD to update function code without Terraform reverting it.
-  # Also ignore triggers to avoid perpetual drift from trigger_desc read bug:
-  # the provider parses HTTP trigger_desc as a timer-trigger struct, reading
-  # it back as empty, causing diff on every plan.
+  # NOTE: Not ignoring triggers — inline triggers need to be created first.
+  # After triggers are created, if trigger_desc causes perpetual drift,
+  # we can add triggers back to ignore_changes.
   lifecycle {
-    ignore_changes = [zip_file, triggers]
+    ignore_changes = [zip_file]
   }
 }
