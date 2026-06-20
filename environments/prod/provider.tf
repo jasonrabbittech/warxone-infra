@@ -3,6 +3,7 @@ terraform {
 
   backend "cos" {
     region = "ap-hongkong"
+    bucket = "tfstate-1376958570"
     prefix = "warxone/terraform-state"
   }
 
