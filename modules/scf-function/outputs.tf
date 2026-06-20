@@ -10,7 +10,8 @@ output "function_id" {
 
 output "http_trigger_url" {
   description = "HTTP trigger (Function URL) endpoint, if enabled"
-  # The 'host' computed attribute contains the Function URL domain
-  # It may be empty for Event-type functions without HTTP triggers
-  value = tencentcloud_scf_function.this.host
+  # NOTE: The 'host' computed attribute is only populated for func_type=HTTP functions.
+  # For Event-type functions with inline HTTP triggers, the URL must be retrieved
+  # via the SCF ListTriggers API (NetConfig.ExtranetUrl in TriggerDesc).
+  value = tencentcloud_scf_function.this.host != "" ? "https://${tencentcloud_scf_function.this.host}" : null
 }
