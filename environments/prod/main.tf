@@ -72,13 +72,14 @@ module "scf" {
   source = "../../modules/scf-function"
   for_each = local.scf_functions
 
-  function_name     = "warxone-${each.key}"
-  description       = each.value.desc
-  memory_size       = each.value.mem
-  timeout           = each.value.timeout
-  cos_bucket        = module.scf_deploy_bucket.bucket_name
-  cos_object_key    = "functions/${each.key}.zip"
-  cos_bucket_region = var.region
+  function_name = "warxone-${each.key}"
+  description   = each.value.desc
+  memory_size   = each.value.mem
+  timeout       = each.value.timeout
+
+  # Bootstrap mode: placeholder handler deployed inline via zip_file.
+  # When actual code is ready, deploy via CI/CD (upload to COS + SCF API).
+  # COS bucket is created but not used for deployment yet.
   environment = merge(local.scf_env, {
     GOOGLE_CLIENT_ID     = each.key == "auth-google" ? var.google_client_id : ""
     GOOGLE_CLIENT_SECRET = each.key == "auth-google" ? var.google_client_secret : ""

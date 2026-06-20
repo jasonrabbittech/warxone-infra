@@ -33,14 +33,18 @@ variable "timeout" {
   default     = 10
 }
 
+# COS deployment — reserved for future CI/CD code deployment.
+# Currently using inline zip_file (bootstrap mode).
 variable "cos_bucket" {
-  description = "COS bucket name for the deployment package"
+  description = "COS bucket name for the deployment package (reserved for future COS deployment)"
   type        = string
+  default     = ""
 }
 
 variable "cos_object_key" {
-  description = "COS object key (path) for the deployment zip"
+  description = "COS object key (path) for the deployment zip (reserved for future COS deployment)"
   type        = string
+  default     = ""
 }
 
 variable "cos_bucket_region" {

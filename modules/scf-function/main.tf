@@ -1,5 +1,19 @@
-# SCF Function deployed from COS bucket
+# SCF Function — placeholder inline deployment
 # Schema source: tencentcloudstack/terraform-provider-tencentcloud
+#
+# BOOTSTRAP MODE: Uses inline zip_file with a placeholder handler.
+# This removes the dependency on pre-existing COS deployment packages.
+# When actual function code is ready, deploy via CI/CD:
+#   1. Upload ZIP to COS bucket
+#   2. Call SCF UpdateFunctionCode API
+# The lifecycle block prevents Terraform from reverting CI/CD code updates.
+
+# Create ZIP archive from placeholder handler
+data "archive_file" "placeholder" {
+  type        = "zip"
+  source_file = "${path.module}/placeholder/index.js"
+  output_path = "${path.module}/placeholder.zip"
+}
 
 resource "tencentcloud_scf_function" "this" {
   name        = var.function_name
@@ -9,10 +23,9 @@ resource "tencentcloud_scf_function" "this" {
   mem_size    = var.memory_size
   timeout     = var.timeout
 
-  # Deploy from COS bucket
-  cos_bucket_name   = var.cos_bucket
-  cos_object_name   = var.cos_object_key
-  cos_bucket_region = var.cos_bucket_region
+  # Inline deployment from local ZIP (bootstrap mode)
+  # Conflicts with cos_bucket_name / cos_object_name / cos_bucket_region
+  zip_file = data.archive_file.placeholder.output_path
 
   # Environment variables (TypeMap, not a block)
   environment = length(var.environment) > 0 ? var.environment : null
@@ -22,6 +35,12 @@ resource "tencentcloud_scf_function" "this" {
   subnet_id = var.subnet_id != "" ? var.subnet_id : null
 
   tags = merge(var.tags, { "app:module" = "scf-function" })
+
+  # Allow CI/CD to update function code without Terraform reverting it.
+  # Terraform manages infrastructure; code deployments are separate.
+  lifecycle {
+    ignore_changes = [zip_file]
+  }
 }
 
 # HTTP trigger (Function URL) — replaces deprecated API Gateway product
