@@ -23,6 +23,10 @@ resource "tencentcloud_scf_function" "this" {
   mem_size    = var.memory_size
   timeout     = var.timeout
 
+  # HTTP function type — required for Function URL (HTTP trigger) compatibility
+  # Default "Event" type is incompatible with HTTP trigger creation
+  func_type = "HTTP"
+
   # Inline deployment from local ZIP (bootstrap mode)
   # Conflicts with cos_bucket_name / cos_object_name / cos_bucket_region
   zip_file = data.archive_file.placeholder.output_path
@@ -52,7 +56,9 @@ resource "tencentcloud_scf_trigger_config" "http" {
   trigger_name  = "http-trigger"
   type          = "http"
   enable        = "OPEN"
-  qualifier     = "$DEFAULT"
+  # $LATEST qualifier — $DEFAULT alias doesn't exist until a version is published
+  # The UpdateTrigger API returns ResourceNotFound if qualifier doesn't exist
+  qualifier     = "$LATEST"
 
   # Required for HTTP triggers: auth type and network config
   # AuthType: NONE (public) or CAM (CAM auth)
