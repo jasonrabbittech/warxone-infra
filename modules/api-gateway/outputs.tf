@@ -5,7 +5,7 @@ output "service_id" {
 
 output "service_url" {
   description = "API Gateway service default domain URL"
-  value       = "https://${tencentcloud_api_gateway_service.this.sub_domain}"
+  value       = "https://${tencentcloud_api_gateway_service.this.service_id}.apigw.tencentcs.com"
 }
 
 output "api_ids" {

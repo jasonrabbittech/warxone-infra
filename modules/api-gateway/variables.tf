@@ -24,10 +24,9 @@ variable "tags" {
 variable "routes" {
   description = "List of API routes to create"
   type = list(object({
-    path           = string
-    method         = string
-    function_name  = string
-    request_mode   = string  # "WHOLE" or "PATH"
+    path          = string
+    method        = string
+    function_name = string
   }))
   default = []
 }

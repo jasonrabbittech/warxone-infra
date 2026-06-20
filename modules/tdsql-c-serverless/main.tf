@@ -34,7 +34,7 @@ resource "tencentcloud_cynosdb_account" "app" {
 }
 
 # Grant privileges to app user
-resource "tencentcloud_cynosdb_account_privilege" "app" {
+resource "tencentcloud_cynosdb_account_privileges" "app" {
   cluster_id    = tencentcloud_cynosdb_cluster.this.id
   account_name  = tencentcloud_cynosdb_account.app.account_name
   global_privileges = ["SELECT", "INSERT", "UPDATE", "DELETE", "CREATE", "ALTER", "INDEX"]

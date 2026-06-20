@@ -8,6 +8,6 @@ resource "tencentcloud_subnet" "this" {
   name       = "${var.name}-subnet"
   vpc_id     = tencentcloud_vpc.this.id
   cidr_block = var.subnet_cidr_block
-  zone       = var.zone
+  availability_zone = var.zone
   tags       = merge(var.tags, { Module = "vpc" })
 }

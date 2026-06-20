@@ -109,13 +109,13 @@ module "api_gateway" {
   tags         = var.tags
 
   routes = [
-    { path = "/api/auth/register", method = "POST", function_name = "warxone-auth-register", request_mode = "WHOLE" },
-    { path = "/api/auth/login",    method = "POST", function_name = "warxone-auth-login",    request_mode = "WHOLE" },
-    { path = "/api/auth/google",   method = "POST", function_name = "warxone-auth-google",   request_mode = "WHOLE" },
-    { path = "/api/auth/refresh",  method = "POST", function_name = "warxone-auth-refresh",  request_mode = "WHOLE" },
-    { path = "/api/auth/logout",   method = "POST", function_name = "warxone-auth-logout",   request_mode = "WHOLE" },
-    { path = "/api/game/save",     method = "GET",    function_name = "warxone-game-load",    request_mode = "WHOLE" },
-    { path = "/api/game/save",     method = "PUT",    function_name = "warxone-game-save",    request_mode = "WHOLE" },
-    { path = "/api/game/save",     method = "DELETE", function_name = "warxone-game-delete",  request_mode = "WHOLE" },
+    { path = "/api/auth/register", method = "POST", function_name = "warxone-auth-register" },
+    { path = "/api/auth/login",    method = "POST", function_name = "warxone-auth-login" },
+    { path = "/api/auth/google",   method = "POST", function_name = "warxone-auth-google" },
+    { path = "/api/auth/refresh",  method = "POST", function_name = "warxone-auth-refresh" },
+    { path = "/api/auth/logout",   method = "POST", function_name = "warxone-auth-logout" },
+    { path = "/api/game/save",     method = "GET",    function_name = "warxone-game-load" },
+    { path = "/api/game/save",     method = "PUT",    function_name = "warxone-game-save" },
+    { path = "/api/game/save",     method = "DELETE", function_name = "warxone-game-delete" },
   ]
 }
