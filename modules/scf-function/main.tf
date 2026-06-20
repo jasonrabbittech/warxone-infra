@@ -23,11 +23,12 @@ resource "tencentcloud_scf_function" "this" {
   mem_size    = var.memory_size
   timeout     = var.timeout
 
-  # HTTP function type — required for the 'host' computed attribute (Function URL)
-  # Event-type functions with inline triggers don't populate 'host'.
-  # func_type="HTTP" also changes handler to receive HTTP-formatted events.
-  # IMPORTANT: Changing func_type requires function deletion and recreation.
-  func_type = "HTTP"
+  # NOTE: func_type defaults to "Event" — must keep Event type because:
+  # 1. Changing func_type requires function deletion+recreation (API limitation)
+  # 2. func_type=HTTP with inline HTTP triggers causes CreateFailed
+  # 3. Event-type functions CAN have HTTP triggers attached (Function URL)
+  # The Function URL is not available in the 'host' attribute for Event-type
+  # functions — it must be retrieved via the SCF API (ListTriggers).
 
   # Inline deployment from local ZIP (bootstrap mode)
   # Conflicts with cos_bucket_name / cos_object_name / cos_bucket_region
@@ -62,10 +63,10 @@ resource "tencentcloud_scf_function" "this" {
   }
 
   # Allow CI/CD to update function code without Terraform reverting it.
-  # NOTE: Not ignoring triggers — inline triggers need to be created first.
-  # After triggers are created, if trigger_desc causes perpetual drift,
-  # we can add triggers back to ignore_changes.
+  # Also ignore triggers to avoid perpetual drift from trigger_desc read bug:
+  # the provider reads back HTTP trigger_desc as empty (timer-only parser),
+  # causing a diff on every plan.
   lifecycle {
-    ignore_changes = [zip_file]
+    ignore_changes = [zip_file, triggers]
   }
 }

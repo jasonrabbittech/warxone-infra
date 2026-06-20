@@ -42,16 +42,7 @@ jobs:
 
       - name: Terraform Apply
         if: steps.plan.outcome == 'success'
-        run: >
-          terraform apply -auto-approve -input=false
-          -replace='module.scf["auth-login"].tencentcloud_scf_function.this'
-          -replace='module.scf["auth-register"].tencentcloud_scf_function.this'
-          -replace='module.scf["auth-google"].tencentcloud_scf_function.this'
-          -replace='module.scf["auth-refresh"].tencentcloud_scf_function.this'
-          -replace='module.scf["auth-logout"].tencentcloud_scf_function.this'
-          -replace='module.scf["game-save"].tencentcloud_scf_function.this'
-          -replace='module.scf["game-load"].tencentcloud_scf_function.this'
-          -replace='module.scf["game-delete"].tencentcloud_scf_function.this'
+        run: terraform apply -auto-approve -input=false
         env:
           TENCENTCLOUD_SECRET_ID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
           TENCENTCLOUD_SECRET_KEY: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
@@ -59,3 +50,50 @@ jobs:
           TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
           TF_VAR_google_client_id: ${{ secrets.GOOGLE_CLIENT_ID }}
           TF_VAR_google_client_secret: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+
+      - name: Get SCF Function URLs
+        if: steps.plan.outcome == 'success'
+        run: |
+          pip install tencentcloud-sdk-python 2>/dev/null
+          python3 -c "
+          import os, json
+          from tencentcloud.common import credential
+          from tencentcloud.common.profile.client_profile import ClientProfile
+          from tencentcloud.common.profile.http_profile import HttpProfile
+          from tencentcloud.scf.v20180416 import scf_client, models
+
+          cred = credential.Credential(
+              os.environ['TENCENTCLOUD_SECRET_ID'],
+              os.environ['TENCENTCLOUD_SECRET_KEY']
+          )
+          httpProfile = HttpProfile()
+          httpProfile.endpoint = 'scf.tencentcloudapi.com'
+          clientProfile = ClientProfile()
+          clientProfile.httpProfile = httpProfile
+          client = scf_client.ScfClient(cred, 'ap-hongkong', clientProfile)
+
+          functions = [
+              'warxone-auth-login', 'warxone-auth-register', 'warxone-auth-google',
+              'warxone-auth-refresh', 'warxone-auth-logout',
+              'warxone-game-save', 'warxone-game-load', 'warxone-game-delete'
+          ]
+          urls = {}
+          for fn in functions:
+              req = models.ListTriggersRequest()
+              req.from_json_string(json.dumps({'FunctionName': fn}))
+              resp = client.ListTriggers(req)
+              triggers = json.loads(resp.to_json_string()).get('Triggers', [])
+              for t in triggers:
+                  if t.get('Type') == 'http' and t.get('Enable') == 1:
+                      desc = json.loads(t.get('TriggerDesc', '{}'))
+                      url = desc.get('NetConfig', {}).get('Host', '')
+                      if url:
+                          urls[fn] = url
+                          print(f'{fn}: https://{url}')
+
+          if not urls:
+              print('WARNING: No HTTP trigger URLs found')
+          "
+        env:
+          TENCENTCLOUD_SECRET_ID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
+          TENCENTCLOUD_SECRET_KEY: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
