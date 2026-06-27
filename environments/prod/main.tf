@@ -65,6 +65,16 @@ locals {
     game-save     = { desc = "Save game state to DB", mem = 256, timeout = 10 }
     game-load     = { desc = "Load game state from DB", mem = 256, timeout = 10 }
     game-delete   = { desc = "Delete game save", mem = 128, timeout = 10 }
+    # Quiz functions
+    quiz-start          = { desc = "Start a new quiz attempt", mem = 256, timeout = 15 }
+    quiz-submit         = { desc = "Submit answer for current question", mem = 256, timeout = 15 }
+    quiz-results        = { desc = "Get quiz attempt results", mem = 256, timeout = 15 }
+    quiz-daily-status   = { desc = "Check daily quiz limit status", mem = 128, timeout = 10 }
+    # Admin quiz management functions
+    admin-quiz-list     = { desc = "List all quiz questions (admin)", mem = 256, timeout = 15 }
+    admin-quiz-create   = { desc = "Create new quiz question (admin)", mem = 256, timeout = 15 }
+    admin-quiz-update   = { desc = "Update quiz question (admin)", mem = 256, timeout = 15 }
+    admin-quiz-delete   = { desc = "Delete quiz question (admin)", mem = 128, timeout = 10 }
   }
 }
 
